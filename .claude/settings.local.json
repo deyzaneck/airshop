@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir:*)",
+      "Bash(copy \"c:\\Users\\admin\\Desktop\\airshop-fixed (5)\\airshop-fixed\\logo\\551b1718-7186-4fd6-b993-cf081f9a5d29.png\" \"c:\\Users\\admin\\Desktop\\airshop-fixed (5)\\airshop-fixed\\public\\logo\\logo.png\")",
+      "Bash(npm install:*)",
+      "Bash(.venvScriptsactivate)",
+      "Bash(type \"c:\\Users\\admin\\Desktop\\airshop-fixed (5)\\airshop-fixed\\src\\components\\layout\\Footer.jsx\")",
+      "Bash(findstr:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
