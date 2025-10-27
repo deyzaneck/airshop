@@ -53,14 +53,8 @@ def add_sample_products():
     with app.app_context():
         # Проверка существующих товаров
         if Product.query.count() > 0:
-            response = input("Products already exist. Delete all and create sample? (y/n): ")
-            if response.lower() != 'y':
-                print("Cancelled.")
-                return
-
-            # Удаление всех товаров
-            Product.query.delete()
-            db.session.commit()
+            print("Products already exist. Skipping sample data creation.")
+            return
 
         print("Creating sample products...")
 
