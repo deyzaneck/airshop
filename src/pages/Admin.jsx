@@ -82,15 +82,6 @@ const Admin = () => {
     }
   };
 
-  const loadSettings = async () => {
-    try {
-      const settingsData = await settingsAPI.get();
-      setSiteSettings(settingsData);
-    } catch (error) {
-      console.error('Ошибка загрузки настроек:', error);
-    }
-  };
-
   // Маппинг русских статусов на английские для API
   const statusToAPI = {
     'Обработка': 'pending',

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Grid, List, SlidersHorizontal, ChevronDown, X } from 'lucide-react';
+import { Grid, List, SlidersHorizontal, X } from 'lucide-react';
 import { productsAPI } from '../api/services';
 import { formatPrice, addToCart } from '../utils/helpers';
 

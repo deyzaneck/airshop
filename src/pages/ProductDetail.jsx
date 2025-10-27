@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { ShoppingCart, Heart, ArrowLeft, ZoomIn, ZoomOut, X } from 'lucide-react';
+import { ShoppingCart, ArrowLeft, ZoomIn, ZoomOut } from 'lucide-react';
 import { productsAPI } from '../api/services';
 import { formatPrice, addToCart } from '../utils/helpers';
 
