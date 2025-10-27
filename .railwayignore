@@ -1,0 +1,14 @@
+# Игнорируем frontend файлы - они деплоятся на Vercel
+node_modules/
+src/
+public/
+build/
+.env
+.env.local
+.env.development
+.env.test
+package.json
+package-lock.json
+
+# Оставляем только backend
+!backend/
