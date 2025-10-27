@@ -10,7 +10,9 @@
       "Bash(del render.yaml build.sh DEPLOY.md)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(git push)"
+      "Bash(git push)",
+      "Bash(del nixpacks.toml railway.json)",
+      "Bash(git rm:*)"
     ],
     "deny": [],
     "ask": []
