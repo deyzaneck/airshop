@@ -6,7 +6,11 @@
       "Bash(npm install:*)",
       "Bash(.venvScriptsactivate)",
       "Bash(type \"c:\\Users\\admin\\Desktop\\airshop-fixed (5)\\airshop-fixed\\src\\components\\layout\\Footer.jsx\")",
-      "Bash(findstr:*)"
+      "Bash(findstr:*)",
+      "Bash(del render.yaml build.sh DEPLOY.md)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push)"
     ],
     "deny": [],
     "ask": []
