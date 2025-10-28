@@ -432,7 +432,7 @@ const Catalog = () => {
               {viewMode === 'grid' && (
                 <div className="absolute bottom-0 left-0 right-0 p-4 z-10">
                   {/* Default state - только бренд и цена */}
-                  <div className="group-hover:opacity-0 group-hover:max-h-0 max-h-24 overflow-hidden transition-all duration-500 ease-in-out">
+                  <div className="group-hover:opacity-0 group-hover:max-h-0 max-h-24 overflow-hidden transition-all duration-350 ease-in-out">
                     <p className="text-sm text-peach-400 uppercase tracking-wider font-bold mb-2 drop-shadow-lg">
                       {product.brand}
                     </p>
@@ -449,8 +449,8 @@ const Catalog = () => {
                   </div>
 
                   {/* Hover state - модель, цена и кнопка */}
-                  <div className="opacity-0 group-hover:opacity-100 max-h-0 group-hover:max-h-48 overflow-hidden transition-all duration-500 ease-in-out">
-                    <div className="relative bg-gradient-to-br from-dark-800/98 via-wine-900/95 to-dark-900/98 backdrop-blur-2xl rounded-2xl p-4 shadow-2xl border-2 border-peach-400/30 transform group-hover:scale-[1.02] transition-transform duration-500">
+                  <div className="opacity-0 group-hover:opacity-100 max-h-0 group-hover:max-h-48 overflow-hidden transition-all duration-350 ease-in-out">
+                    <div className="relative bg-gradient-to-br from-dark-800/98 via-wine-900/95 to-dark-900/98 backdrop-blur-2xl rounded-2xl p-4 shadow-2xl border-2 border-peach-400/30 transform group-hover:scale-[1.02] transition-transform duration-350">
                       {/* Внутреннее свечение */}
                       <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-peach-400/10 via-transparent to-wine-500/10 pointer-events-none"></div>
 
@@ -460,7 +460,7 @@ const Catalog = () => {
                           {product.name}
                         </h3>
 
-                        <div className="flex items-end justify-between gap-3">
+                        <div className="flex items-end justify-between gap-2">
                           <div className="flex flex-col">
                             {product.oldPrice && (
                               <span className="text-xs text-light-300/70 line-through mb-0.5">
@@ -477,7 +477,7 @@ const Catalog = () => {
                               e.preventDefault();
                               handleAddToCart(product);
                             }}
-                            className="btn btn-primary text-xs py-2 px-4 whitespace-nowrap shadow-lg hover:shadow-peach-400/50 transition-all duration-300"
+                            className="btn btn-primary text-[10px] py-1.5 px-2 whitespace-nowrap shadow-lg hover:shadow-peach-400/50 transition-all duration-300 leading-tight"
                           >
                             В корзину
                           </button>
