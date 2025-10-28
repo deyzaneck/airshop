@@ -110,13 +110,14 @@ def create_app(config_name='development'):
         return response
 
     # Регистрация blueprints
-    from app.routes import auth, products, orders, payment, settings
+    from app.routes import auth, products, orders, payment, settings, admin_import
 
     app.register_blueprint(auth.bp, url_prefix='/api/auth')
     app.register_blueprint(products.bp, url_prefix='/api/products')
     app.register_blueprint(orders.bp, url_prefix='/api/orders')
     app.register_blueprint(payment.bp, url_prefix='/api/payment')
     app.register_blueprint(settings.bp, url_prefix='/api/settings')
+    app.register_blueprint(admin_import.bp)
 
     # Отдача статических файлов React (только в production)
     if config_name == 'production' and os.path.exists(static_folder):
