@@ -58,6 +58,15 @@ export const productsAPI = {
   },
 };
 
+// ============= ADMIN =============
+
+export const adminAPI = {
+  importCSV: async (csvData) => {
+    const response = await apiClient.post('/admin/import-csv', { csv_data: csvData });
+    return response.data;
+  }
+};
+
 // ============= ORDERS =============
 
 export const ordersAPI = {

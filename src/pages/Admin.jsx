@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Package, Users, ShoppingBag, DollarSign, X, Eye, Phone, Mail, MapPin, Send, Settings, Edit, Trash2, Plus, LogOut } from 'lucide-react';
+import { Package, Users, ShoppingBag, DollarSign, X, Eye, Phone, Mail, MapPin, Send, Settings, Edit, Trash2, Plus, LogOut, Upload } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { formatPrice } from '../utils/helpers';
-import { productsAPI, ordersAPI, settingsAPI, authAPI } from '../api/services';
+import { productsAPI, ordersAPI, settingsAPI, authAPI, adminAPI } from '../api/services';
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -22,6 +22,11 @@ const Admin = () => {
     hero: { title: '', subtitle: '' },
     contact: { phone: '', email: '', telegram: '' }
   });
+
+  // CSV Import state
+  const [csvImportData, setCsvImportData] = useState('');
+  const [importLoading, setImportLoading] = useState(false);
+  const [importResult, setImportResult] = useState(null);
 
   useEffect(() => {
     loadAllData();
@@ -147,6 +152,36 @@ const Admin = () => {
     } catch (error) {
       console.error('Ошибка сохранения настроек:', error);
       alert('Ошибка сохранения настроек');
+    }
+  };
+
+  const handleImportCSV = async () => {
+    if (!csvImportData.trim()) {
+      alert('Пожалуйста, вставьте CSV данные');
+      return;
+    }
+
+    setImportLoading(true);
+    setImportResult(null);
+
+    try {
+      const result = await adminAPI.importCSV(csvImportData);
+      setImportResult(result);
+      setCsvImportData('');
+
+      // Перезагружаем товары после успешного импорта
+      await loadProducts();
+
+      alert(`Импорт завершен! Импортировано товаров: ${result.imported}`);
+    } catch (error) {
+      console.error('Ошибка импорта CSV:', error);
+      setImportResult({
+        success: false,
+        error: error.response?.data?.error || error.message || 'Ошибка импорта'
+      });
+      alert('Ошибка импорта каталога. Проверьте формат CSV.');
+    } finally {
+      setImportLoading(false);
     }
   };
 
@@ -353,6 +388,17 @@ const Admin = () => {
               }`}
             >
               Настройки
+            </button>
+            <button
+              onClick={() => setActiveTab('import')}
+              className={`px-4 py-2 rounded-lg font-semibold transition-colors whitespace-nowrap flex items-center gap-2 ${
+                activeTab === 'import'
+                  ? 'bg-peach-400/20 text-peach-400'
+                  : 'text-light-300 hover:text-peach-400'
+              }`}
+            >
+              <Upload className="w-4 h-4" />
+              Импорт
             </button>
           </div>
 
@@ -623,12 +669,88 @@ const Admin = () => {
                   </div>
                 </div>
 
-                <button 
+                <button
                   onClick={handleSaveSettings}
                   className="btn btn-primary w-full"
                 >
                   Сохранить настройки
                 </button>
+              </div>
+            </div>
+          )}
+
+          {/* Import Tab */}
+          {activeTab === 'import' && (
+            <div>
+              <h3 className="text-xl font-bold text-light-100 mb-4">Импорт каталога из CSV</h3>
+
+              <div className="space-y-6">
+                {/* Instructions */}
+                <div className="bg-glass p-6 rounded-xl border border-glass">
+                  <h4 className="text-lg font-semibold text-light-100 mb-3 flex items-center gap-2">
+                    <Upload className="w-5 h-5 text-peach-400" />
+                    Инструкция
+                  </h4>
+                  <div className="space-y-2 text-light-300 text-sm">
+                    <p>1. Откройте файл table_update.csv в текстовом редакторе</p>
+                    <p>2. Скопируйте все содержимое файла</p>
+                    <p>3. Вставьте в поле ниже</p>
+                    <p>4. Нажмите "Импортировать каталог"</p>
+                    <p className="text-peach-400 font-semibold mt-4">⚠️ Внимание: Все существующие товары будут удалены и заменены новыми</p>
+                  </div>
+                </div>
+
+                {/* CSV Input */}
+                <div className="bg-glass p-6 rounded-xl border border-glass">
+                  <label className="block text-light-200 text-sm font-medium mb-2">
+                    CSV данные
+                  </label>
+                  <textarea
+                    value={csvImportData}
+                    onChange={(e) => setCsvImportData(e.target.value)}
+                    className="input w-full font-mono text-sm"
+                    rows="12"
+                    placeholder="Вставьте сюда содержимое CSV файла...&#10;Формат: Бренд;Модель;Описание;Цена;Скидка (в процентах);Изображения (через ;)"
+                    disabled={importLoading}
+                  />
+                </div>
+
+                {/* Import Button */}
+                <button
+                  onClick={handleImportCSV}
+                  className="btn btn-primary w-full"
+                  disabled={importLoading || !csvImportData.trim()}
+                >
+                  {importLoading ? 'Импортирование...' : 'Импортировать каталог'}
+                </button>
+
+                {/* Import Results */}
+                {importResult && (
+                  <div className={`bg-glass p-6 rounded-xl border ${importResult.success ? 'border-green-500/50' : 'border-red-500/50'}`}>
+                    <h4 className={`text-lg font-semibold mb-3 ${importResult.success ? 'text-green-400' : 'text-red-400'}`}>
+                      {importResult.success ? '✅ Импорт завершен!' : '❌ Ошибка импорта'}
+                    </h4>
+                    {importResult.success ? (
+                      <div className="space-y-2 text-light-300 text-sm">
+                        <p>Импортировано товаров: <span className="font-bold text-green-400">{importResult.imported}</span></p>
+                        {importResult.errors && importResult.errors.length > 0 && (
+                          <div className="mt-4">
+                            <p className="text-yellow-400 font-semibold mb-2">Предупреждения:</p>
+                            <div className="space-y-1 max-h-40 overflow-y-auto">
+                              {importResult.errors.map((err, idx) => (
+                                <p key={idx} className="text-xs text-yellow-300">
+                                  Строка {err.row}: {err.error}
+                                </p>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <p className="text-light-300 text-sm">{importResult.error}</p>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           )}
