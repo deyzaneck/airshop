@@ -285,62 +285,43 @@ const Home = () => {
                     </div>
                   </div>
 
-                  {/* Content - compact info at bottom */}
-                  <div className="absolute bottom-0 left-0 right-0 p-4 z-10">
-                    {/* Default state - только бренд и цена */}
-                    <div className="group-hover:opacity-0 group-hover:max-h-0 max-h-24 overflow-hidden transition-all duration-350 ease-in-out">
-                      <p className="text-sm text-peach-400 uppercase tracking-wider font-bold mb-2 drop-shadow-lg">
-                        {product.brand}
-                      </p>
-                      <div className="flex items-baseline gap-2">
-                        {product.oldPrice && (
-                          <span className="text-xs text-light-300/80 line-through drop-shadow-md">
-                            {formatPrice(product.oldPrice)}
+                  {/* Content - elegant hover overlay */}
+                  <div className="absolute inset-0 z-10 flex flex-col justify-end p-4">
+                    {/* Default state - минимальная информация */}
+                    <div className="transform translate-y-0 group-hover:translate-y-[-8px] transition-all duration-400 ease-out">
+                      <div className="bg-dark-900/40 backdrop-blur-sm rounded-xl p-3 group-hover:bg-dark-900/95 group-hover:backdrop-blur-xl transition-all duration-400">
+                        <p className="text-sm text-peach-400 uppercase tracking-wide font-semibold mb-1.5">
+                          {product.brand}
+                        </p>
+                        <div className="flex items-baseline gap-2 mb-2">
+                          {product.oldPrice && (
+                            <span className="text-xs text-light-300/70 line-through">
+                              {formatPrice(product.oldPrice)}
+                            </span>
+                          )}
+                          <span className="text-base font-bold text-light-100">
+                            {formatPrice(product.price)}
                           </span>
-                        )}
-                        <span className="text-lg font-bold text-light-100 drop-shadow-lg">
-                          {formatPrice(product.price)}
-                        </span>
+                        </div>
                       </div>
                     </div>
 
-                    {/* Hover state - модель, цена и кнопка */}
-                    <div className="opacity-0 group-hover:opacity-100 max-h-0 group-hover:max-h-48 overflow-hidden transition-all duration-350 ease-in-out">
-                      <div className="relative bg-gradient-to-br from-dark-800/98 via-wine-900/95 to-dark-900/98 backdrop-blur-2xl rounded-2xl p-4 shadow-2xl border-2 border-peach-400/30 transform group-hover:scale-[1.02] transition-transform duration-350">
-                        {/* Внутреннее свечение */}
-                        <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-peach-400/10 via-transparent to-wine-500/10 pointer-events-none"></div>
+                    {/* Hover state - дополнительная информация */}
+                    <div className="opacity-0 group-hover:opacity-100 max-h-0 group-hover:max-h-32 overflow-hidden transition-all duration-400 ease-out transform translate-y-2 group-hover:translate-y-0">
+                      <div className="mt-2 bg-gradient-to-br from-wine-900/95 to-dark-900/95 backdrop-blur-xl rounded-xl p-3 border border-peach-400/20 shadow-xl">
+                        <h3 className="text-sm font-medium text-light-100 mb-2.5 line-clamp-2 leading-snug">
+                          {product.name}
+                        </h3>
 
-                        {/* Контент */}
-                        <div className="relative">
-                          <h3 className="text-sm md:text-base font-bold text-light-100 mb-3 line-clamp-2 leading-tight">
-                            {product.name}
-                          </h3>
-
-                          <div className="space-y-2">
-                            {/* Цена */}
-                            <div className="flex items-baseline gap-2">
-                              {product.oldPrice && (
-                                <span className="text-xs text-light-300/70 line-through">
-                                  {formatPrice(product.oldPrice)}
-                                </span>
-                              )}
-                              <span className="text-lg md:text-xl font-bold text-light-100 bg-gradient-to-r from-peach-400 to-gold-400 bg-clip-text text-transparent">
-                                {formatPrice(product.price)}
-                              </span>
-                            </div>
-
-                            {/* Кнопка на всю ширину */}
-                            <button
-                              onClick={(e) => {
-                                e.preventDefault();
-                                handleAddToCart(product);
-                              }}
-                              className="btn btn-primary w-full text-xs py-2 shadow-lg hover:shadow-peach-400/50 transition-all duration-300"
-                            >
-                              В корзину
-                            </button>
-                          </div>
-                        </div>
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleAddToCart(product);
+                          }}
+                          className="btn btn-primary w-full text-xs py-1.5 font-medium hover:scale-[1.02] active:scale-[0.98] transition-transform duration-200"
+                        >
+                          В корзину
+                        </button>
                       </div>
                     </div>
                   </div>
