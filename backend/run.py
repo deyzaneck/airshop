@@ -30,7 +30,8 @@ def parse_category(name):
 
 def import_products_from_csv():
     """Импорт товаров из CSV файла"""
-    csv_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'table.csv')
+    # В production (Docker) файл находится в /app/table.csv
+    csv_path = os.path.join(os.path.dirname(__file__), 'table.csv')
 
     if not os.path.exists(csv_path):
         print(f"⚠️  CSV файл не найден: {csv_path}")

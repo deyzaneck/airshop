@@ -127,19 +127,27 @@ def create_app(config_name='development'):
 
     # Создание таблиц БД
     with app.app_context():
-        db.create_all()
+        # Проверяем существование таблиц перед созданием
+        inspector = db.inspect(db.engine)
+        if not inspector.has_table('users'):
+            db.create_all()
+            print("✓ Database tables created")
 
         # Создание дефолтного админа если его нет
         from app.models import User
-        admin = User.query.filter_by(username='admin').first()
-        if not admin:
-            admin = User(
-                username=app.config['ADMIN_USERNAME'],
-                email=app.config['ADMIN_EMAIL']
-            )
-            admin.set_password(app.config['ADMIN_PASSWORD'])
-            db.session.add(admin)
-            db.session.commit()
-            print(f"✓ Default admin user created: {admin.username}")
+        try:
+            admin = User.query.filter_by(username='admin').first()
+            if not admin:
+                admin = User(
+                    username=app.config['ADMIN_USERNAME'],
+                    email=app.config['ADMIN_EMAIL']
+                )
+                admin.set_password(app.config['ADMIN_PASSWORD'])
+                db.session.add(admin)
+                db.session.commit()
+                print(f"✓ Default admin user created: {admin.username}")
+        except Exception as e:
+            # Игнорируем ошибки если admin уже создан другим worker
+            db.session.rollback()
 
     return app
