@@ -17,9 +17,28 @@ class Config:
     TESTING = False
 
     # Database
-    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', 'sqlite:///airshop.db')
+    database_url = os.getenv('DATABASE_URL', 'sqlite:///airshop.db')
+
+    # Fix для Railway: postgres:// -> postgresql://
+    if database_url.startswith('postgres://'):
+        database_url = database_url.replace('postgres://', 'postgresql://', 1)
+
+    SQLALCHEMY_DATABASE_URI = database_url
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ECHO = False
+
+    # SSL настройки для PostgreSQL (Railway)
+    if database_url.startswith('postgresql://'):
+        SQLALCHEMY_ENGINE_OPTIONS = {
+            'connect_args': {
+                'sslmode': 'require',
+                'connect_timeout': 10
+            },
+            'pool_pre_ping': True,  # Проверка соединения перед использованием
+            'pool_recycle': 300,    # Пересоздание соединений каждые 5 минут
+        }
+    else:
+        SQLALCHEMY_ENGINE_OPTIONS = {}
 
     # JWT
     JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY', 'jwt-secret-key-change-in-production')
