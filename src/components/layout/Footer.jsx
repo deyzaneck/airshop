@@ -49,19 +49,27 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link 
-                  to="/catalog?category=women" 
+                <Link
+                  to="/catalog?category=women"
                   className="text-light-300 hover:text-peach-400 transition-colors text-sm"
                 >
                   Женские
                 </Link>
               </li>
               <li>
-                <Link 
-                  to="/catalog?category=men" 
+                <Link
+                  to="/catalog?category=men"
                   className="text-light-300 hover:text-peach-400 transition-colors text-sm"
                 >
                   Мужские
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/catalog?category=unisex"
+                  className="text-light-300 hover:text-peach-400 transition-colors text-sm"
+                >
+                  Унисекс
                 </Link>
               </li>
             </ul>

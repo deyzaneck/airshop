@@ -9,7 +9,8 @@ const Catalog = () => {
   const [allProducts, setAllProducts] = useState([]);
   const [viewMode, setViewMode] = useState('grid');
   const [category, setCategory] = useState('all');
-  const [showFilters, setShowFilters] = useState(true);
+  // Фильтры скрыты по умолчанию на мобильных (< 1024px), открыты на десктопе
+  const [showFilters, setShowFilters] = useState(window.innerWidth >= 1024);
 
   // Фильтры
   const [selectedBrands, setSelectedBrands] = useState([]);
@@ -42,7 +43,16 @@ const Catalog = () => {
 
   // Получаем уникальные бренды и объемы
   const brands = useMemo(() => {
-    const uniqueBrands = [...new Set(allProducts.map(p => p.brand))];
+    // Normalize brands: capitalize first letter, убираем дубликаты
+    const brandMap = new Map();
+    allProducts.forEach(p => {
+      const normalized = p.brand.charAt(0).toUpperCase() + p.brand.slice(1).toLowerCase();
+      const key = normalized.toLowerCase();
+      if (!brandMap.has(key)) {
+        brandMap.set(key, normalized);
+      }
+    });
+    const uniqueBrands = Array.from(brandMap.values());
 
     // Топ-5 популярных брендов (регистронезависимое сравнение)
     const popularBrands = ['versace', 'dior', 'chanel', 'tom', 'byredo'];
@@ -59,8 +69,13 @@ const Catalog = () => {
   }, [allProducts]);
 
   const volumes = useMemo(() => {
-    const uniqueVolumes = [...new Set(allProducts.map(p => p.volume))].sort();
-    return uniqueVolumes;
+    const uniqueVolumes = [...new Set(allProducts.map(p => p.volume))];
+    // Сортируем по числовому значению от большего к меньшему
+    return uniqueVolumes.sort((a, b) => {
+      const numA = parseInt(a.match(/\d+/) || 0);
+      const numB = parseInt(b.match(/\d+/) || 0);
+      return numB - numA; // По убыванию
+    });
   }, [allProducts]);
 
   // Фильтрация и сортировка
