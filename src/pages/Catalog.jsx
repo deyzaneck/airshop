@@ -122,8 +122,6 @@ const Catalog = () => {
     return filtered;
   }, [allProducts, category, searchParams, selectedBrands, priceRange, selectedVolumes, sortBy]);
 
-  const [hoveredIndex, setHoveredIndex] = useState(null);
-
   const handleAddToCart = (product) => {
     addToCart(product, 1);
     window.dispatchEvent(new Event('cartUpdated'));
@@ -395,156 +393,150 @@ const Catalog = () => {
         {/* Products Grid/List */}
         <div className={`grid gap-4 ${viewMode === 'grid' ? 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5' : 'grid-cols-1'}`}>
           {products.map((product, index) => (
-            <div
+            <Link
               key={product.id}
-              className={`relative transition-all duration-500 animate-scale-in ${
-                viewMode === 'grid'
-                  ? hoveredIndex === index
-                    ? 'col-span-2 z-20'
-                    : hoveredIndex !== null && Math.abs(hoveredIndex - index) === 1
-                    ? 'scale-95 opacity-90'
-                    : ''
-                  : ''
-              }`}
+              to={`/product/${product.id}`}
+              className={`group relative overflow-hidden rounded-2xl border border-glass hover:border-peach-400 transition-all duration-300 block animate-scale-in ${
+                viewMode === 'grid' ? 'aspect-[3/4]' : 'aspect-[5/2] md:aspect-[6/1]'
+              } hover-lift`}
               style={{animationDelay: `${index * 0.05}s`}}
-              onMouseEnter={() => setHoveredIndex(index)}
-              onMouseLeave={() => setHoveredIndex(null)}
             >
-              <Link
-                to={`/product/${product.id}`}
-                className={`group relative overflow-hidden rounded-2xl border border-glass hover:border-peach-400 transition-all duration-500 block ${
-                  viewMode === 'grid' ? 'aspect-[3/4]' : 'aspect-[5/2] md:aspect-[6/1]'
-                } hover-lift hover-glow`}
-              >
-                {/* Background Image */}
-                <img
-                  src={product.image}
-                  alt={product.name}
-                  className={`absolute inset-0 object-cover transform transition-all duration-700 ${
-                    hoveredIndex === index && viewMode === 'grid'
-                      ? 'w-1/2 group-hover:scale-110'
-                      : 'w-full h-full group-hover:scale-105'
-                  }`}
-                  loading="lazy"
-                />
+              {/* Background Image */}
+              <img
+                src={product.image}
+                alt={product.name}
+                className="absolute inset-0 w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
+                loading="lazy"
+              />
 
-                {/* Gradient Overlay on Image */}
-                <div className={`absolute inset-0 bg-gradient-to-t from-dark-900/40 to-transparent transition-all duration-300 ${
-                  hoveredIndex === index && viewMode === 'grid' ? 'w-1/2' : 'w-full'
-                }`}></div>
+              {/* Gradient Overlay - subtle by default, stronger on hover */}
+              <div className="absolute inset-0 bg-gradient-to-t from-dark-900/60 via-transparent to-transparent group-hover:from-dark-900/90 transition-all duration-300"></div>
 
-                {/* Badges */}
-                <div className="absolute top-3 left-3 right-3 flex justify-between items-start z-10">
-                  {product.isNew && (
-                    <span className="badge badge-outline bg-dark-900/80 backdrop-blur-sm text-xs">
-                      Новинка
+              {/* Badges */}
+              <div className="absolute top-3 left-3 right-3 flex justify-between items-start z-10">
+                {product.isNew && (
+                  <span className="badge badge-outline bg-dark-900/80 backdrop-blur-sm text-xs">
+                    Новинка
+                  </span>
+                )}
+                <div className="flex gap-2 ml-auto">
+                  {product.discount > 0 && (
+                    <span className="badge badge-accent text-xs">
+                      -{product.discount}%
                     </span>
                   )}
-                  <div className="flex gap-2 ml-auto">
-                    {product.discount > 0 && (
-                      <span className="badge badge-accent text-xs">
-                        -{product.discount}%
-                      </span>
-                    )}
-                  </div>
                 </div>
+              </div>
 
-                {/* Slide-out Info Panel - только для grid mode */}
-                {viewMode === 'grid' && (
-                  <div
-                    className={`absolute top-0 right-0 bottom-0 w-1/2 bg-gradient-to-br from-dark-800/98 via-wine-900/95 to-dark-900/98 backdrop-blur-xl border-l border-peach-400/30 p-4 flex flex-col justify-between transform transition-all duration-500 ${
-                      hoveredIndex === index
-                        ? 'translate-x-0 opacity-100'
-                        : 'translate-x-full opacity-0 pointer-events-none'
-                    }`}
-                  >
-                    <div className="space-y-2">
-                      <p className="text-xs text-peach-400 uppercase tracking-wider font-bold">
-                        {product.brand}
-                      </p>
-                      <h3 className="text-sm md:text-base font-bold text-light-100 line-clamp-3 leading-tight">
-                        {product.name}
-                      </h3>
-                      <p className="text-xs text-light-300">
-                        {product.volume}
-                      </p>
+              {/* Content - Grid mode: compact info at bottom */}
+              {viewMode === 'grid' && (
+                <div className="absolute bottom-0 left-0 right-0 p-3 z-10">
+                  {/* Default state - minimal info */}
+                  <div className="transform translate-y-0 group-hover:-translate-y-1 transition-all duration-300">
+                    <p className="text-xs text-peach-400 uppercase tracking-wider font-bold mb-1">
+                      {product.brand}
+                    </p>
+                    <h3 className="text-sm font-bold text-light-100 line-clamp-1 mb-1">
+                      {product.name}
+                    </h3>
+                    <p className="text-xs text-light-300 mb-2 opacity-80">
+                      {product.volume}
+                    </p>
+                  </div>
 
+                  {/* Hover state - expanded info with backdrop blur */}
+                  <div className="opacity-0 group-hover:opacity-100 max-h-0 group-hover:max-h-40 overflow-hidden transition-all duration-300">
+                    <div className="bg-dark-900/95 backdrop-blur-xl rounded-xl p-3 border border-peach-400/20 shadow-2xl">
                       {product.description && (
-                        <p className="text-xs text-light-400 line-clamp-3 mt-2">
+                        <p className="text-xs text-light-400 line-clamp-2 mb-3">
                           {product.description}
                         </p>
                       )}
-                    </div>
 
-                    <div className="space-y-3">
-                      <div className="flex items-baseline gap-2">
-                        {product.oldPrice && (
-                          <span className="text-xs text-light-400 line-through">
-                            {formatPrice(product.oldPrice)}
-                          </span>
-                        )}
-                        <span className="text-xl font-bold text-light-100">
-                          {formatPrice(product.price)}
-                        </span>
-                      </div>
-
-                      <button
-                        onClick={(e) => {
-                          e.preventDefault();
-                          handleAddToCart(product);
-                        }}
-                        className="btn btn-primary text-xs py-2 px-3 w-full"
-                      >
-                        В корзину
-                      </button>
-                    </div>
-                  </div>
-                )}
-
-                {/* List mode content */}
-                {viewMode === 'list' && (
-                  <div className="absolute inset-0 flex items-center">
-                    <div className="absolute inset-0 bg-gradient-to-t from-dark-900/95 via-dark-900/60 to-transparent"></div>
-                    <div className="flex items-center gap-4 md:gap-6 px-4 w-full relative z-10">
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs text-peach-400 uppercase tracking-wider mb-1 font-bold">
-                          {product.brand}
-                        </p>
-                        <h3 className="text-base md:text-lg font-bold text-light-100 mb-1 line-clamp-1 group-hover:text-peach-400 transition-colors">
-                          {product.name}
-                        </h3>
-                        <p className="text-sm text-light-300 mb-2">
-                          {product.volume}
-                        </p>
-
-                        <div className="flex items-baseline gap-3">
+                      <div className="flex items-end justify-between gap-2">
+                        <div className="flex flex-col">
                           {product.oldPrice && (
-                            <span className="text-sm text-light-400 line-through">
+                            <span className="text-xs text-light-400 line-through">
                               {formatPrice(product.oldPrice)}
                             </span>
                           )}
-                          <span className="text-xl md:text-2xl font-bold text-light-100">
+                          <span className="text-lg font-bold text-light-100">
                             {formatPrice(product.price)}
                           </span>
                         </div>
-                      </div>
 
-                      <div className="flex-shrink-0">
                         <button
                           onClick={(e) => {
                             e.preventDefault();
                             handleAddToCart(product);
                           }}
-                          className="btn btn-primary text-xs py-2 px-3 md:text-sm md:py-2 md:px-4"
+                          className="btn btn-primary text-xs py-1.5 px-3 whitespace-nowrap"
                         >
                           В корзину
                         </button>
                       </div>
                     </div>
                   </div>
-                )}
-              </Link>
-            </div>
+
+                  {/* Simple price shown by default */}
+                  <div className="group-hover:opacity-0 group-hover:max-h-0 max-h-20 transition-all duration-300">
+                    <div className="flex items-baseline gap-2">
+                      {product.oldPrice && (
+                        <span className="text-xs text-light-400 line-through">
+                          {formatPrice(product.oldPrice)}
+                        </span>
+                      )}
+                      <span className="text-base font-bold text-light-100">
+                        {formatPrice(product.price)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* List mode content */}
+              {viewMode === 'list' && (
+                <div className="absolute inset-0 flex items-center">
+                  <div className="absolute inset-0 bg-gradient-to-t from-dark-900/95 via-dark-900/60 to-transparent"></div>
+                  <div className="flex items-center gap-4 md:gap-6 px-4 w-full relative z-10">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-peach-400 uppercase tracking-wider mb-1 font-bold">
+                        {product.brand}
+                      </p>
+                      <h3 className="text-base md:text-lg font-bold text-light-100 mb-1 line-clamp-1 group-hover:text-peach-400 transition-colors">
+                        {product.name}
+                      </h3>
+                      <p className="text-sm text-light-300 mb-2">
+                        {product.volume}
+                      </p>
+
+                      <div className="flex items-baseline gap-3">
+                        {product.oldPrice && (
+                          <span className="text-sm text-light-400 line-through">
+                            {formatPrice(product.oldPrice)}
+                          </span>
+                        )}
+                        <span className="text-xl md:text-2xl font-bold text-light-100">
+                          {formatPrice(product.price)}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex-shrink-0">
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleAddToCart(product);
+                        }}
+                        className="btn btn-primary text-xs py-1.5 px-3 md:text-sm md:py-2 md:px-4"
+                      >
+                        В корзину
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </Link>
           ))}
         </div>
 

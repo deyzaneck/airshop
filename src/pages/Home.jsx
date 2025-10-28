@@ -8,7 +8,6 @@ const Home = () => {
   const [products, setProducts] = useState([]);
   const [settings, setSettings] = useState({});
   const [particles, setParticles] = useState([]);
-  const [hoveredIndex, setHoveredIndex] = useState(null);
 
   useEffect(() => {
     // Загружаем товары из API
@@ -251,109 +250,105 @@ const Home = () => {
 
           {/* Centered grid container */}
           <div className="max-w-5xl mx-auto">
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 justify-items-center">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {products.slice(0, 4).map((product, index) => (
-                <div
+                <Link
                   key={product.id}
-                  className={`relative transition-all duration-500 animate-fade-in w-full ${
-                    hoveredIndex === index
-                      ? 'col-span-2 z-20'
-                      : hoveredIndex !== null && Math.abs(hoveredIndex - index) === 1
-                      ? 'scale-95 opacity-90'
-                      : ''
-                  }`}
+                  to={`/product/${product.id}`}
+                  className="group relative overflow-hidden rounded-2xl aspect-[3/4] border border-glass hover:border-peach-400 transition-all duration-300 block hover-lift animate-fade-in"
                   style={{animationDelay: `${0.1 * (index + 1)}s`}}
-                  onMouseEnter={() => setHoveredIndex(index)}
-                  onMouseLeave={() => setHoveredIndex(null)}
                 >
-                  <Link
-                    to={`/product/${product.id}`}
-                    className="group relative overflow-hidden rounded-2xl aspect-[3/4] border border-glass hover:border-peach-400 transition-all duration-500 block hover-lift hover-glow"
-                  >
-                    {/* Background Image */}
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className={`absolute inset-0 object-cover transform transition-all duration-700 ${
-                        hoveredIndex === index
-                          ? 'w-1/2 group-hover:scale-110'
-                          : 'w-full h-full group-hover:scale-105'
-                      }`}
-                      loading="lazy"
-                    />
+                  {/* Background Image */}
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    className="absolute inset-0 w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
+                    loading="lazy"
+                  />
 
-                    {/* Gradient Overlay on Image */}
-                    <div className={`absolute inset-0 bg-gradient-to-t from-dark-900/40 to-transparent transition-all duration-300 ${
-                      hoveredIndex === index ? 'w-1/2' : 'w-full'
-                    }`}></div>
+                  {/* Gradient Overlay - subtle by default, stronger on hover */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-dark-900/60 via-transparent to-transparent group-hover:from-dark-900/90 transition-all duration-300"></div>
 
-                    {/* Badges */}
-                    <div className="absolute top-3 left-3 right-3 flex justify-between items-start z-10">
-                      {product.isNew && (
-                        <span className="badge badge-outline bg-dark-900/80 backdrop-blur-sm text-xs">
-                          Новинка
+                  {/* Badges */}
+                  <div className="absolute top-3 left-3 right-3 flex justify-between items-start z-10">
+                    {product.isNew && (
+                      <span className="badge badge-outline bg-dark-900/80 backdrop-blur-sm text-xs">
+                        Новинка
+                      </span>
+                    )}
+                    <div className="flex gap-2 ml-auto">
+                      {product.discount > 0 && (
+                        <span className="badge badge-accent text-xs">
+                          -{product.discount}%
                         </span>
                       )}
-                      <div className="flex gap-2 ml-auto">
-                        {product.discount > 0 && (
-                          <span className="badge badge-accent text-xs">
-                            -{product.discount}%
-                          </span>
-                        )}
-                      </div>
+                    </div>
+                  </div>
+
+                  {/* Content - compact info at bottom */}
+                  <div className="absolute bottom-0 left-0 right-0 p-3 z-10">
+                    {/* Default state - minimal info */}
+                    <div className="transform translate-y-0 group-hover:-translate-y-1 transition-all duration-300">
+                      <p className="text-xs text-peach-400 uppercase tracking-wider font-bold mb-1">
+                        {product.brand}
+                      </p>
+                      <h3 className="text-sm font-bold text-light-100 line-clamp-1 mb-1">
+                        {product.name}
+                      </h3>
+                      <p className="text-xs text-light-300 mb-2 opacity-80">
+                        {product.volume}
+                      </p>
                     </div>
 
-                    {/* Slide-out Info Panel */}
-                    <div
-                      className={`absolute top-0 right-0 bottom-0 w-1/2 bg-gradient-to-br from-dark-800/98 via-wine-900/95 to-dark-900/98 backdrop-blur-xl border-l border-peach-400/30 p-4 flex flex-col justify-between transform transition-all duration-500 ${
-                        hoveredIndex === index
-                          ? 'translate-x-0 opacity-100'
-                          : 'translate-x-full opacity-0 pointer-events-none'
-                      }`}
-                    >
-                      <div className="space-y-2">
-                        <p className="text-xs text-peach-400 uppercase tracking-wider font-bold">
-                          {product.brand}
-                        </p>
-                        <h3 className="text-sm md:text-base font-bold text-light-100 line-clamp-3 leading-tight">
-                          {product.name}
-                        </h3>
-                        <p className="text-xs text-light-300">
-                          {product.volume}
-                        </p>
-
+                    {/* Hover state - expanded info with backdrop blur */}
+                    <div className="opacity-0 group-hover:opacity-100 max-h-0 group-hover:max-h-40 overflow-hidden transition-all duration-300">
+                      <div className="bg-dark-900/95 backdrop-blur-xl rounded-xl p-3 border border-peach-400/20 shadow-2xl">
                         {product.description && (
-                          <p className="text-xs text-light-400 line-clamp-3 mt-2">
+                          <p className="text-xs text-light-400 line-clamp-2 mb-3">
                             {product.description}
                           </p>
                         )}
-                      </div>
 
-                      <div className="space-y-3">
-                        <div className="flex items-baseline gap-2">
-                          {product.oldPrice && (
-                            <span className="text-xs text-light-400 line-through">
-                              {formatPrice(product.oldPrice)}
+                        <div className="flex items-end justify-between gap-2">
+                          <div className="flex flex-col">
+                            {product.oldPrice && (
+                              <span className="text-xs text-light-400 line-through">
+                                {formatPrice(product.oldPrice)}
+                              </span>
+                            )}
+                            <span className="text-lg font-bold text-light-100">
+                              {formatPrice(product.price)}
                             </span>
-                          )}
-                          <span className="text-xl font-bold text-light-100">
-                            {formatPrice(product.price)}
-                          </span>
-                        </div>
+                          </div>
 
-                        <button
-                          onClick={(e) => {
-                            e.preventDefault();
-                            handleAddToCart(product);
-                          }}
-                          className="btn btn-primary text-xs py-2 px-3 w-full"
-                        >
-                          В корзину
-                        </button>
+                          <button
+                            onClick={(e) => {
+                              e.preventDefault();
+                              handleAddToCart(product);
+                            }}
+                            className="btn btn-primary text-xs py-1.5 px-3 whitespace-nowrap"
+                          >
+                            В корзину
+                          </button>
+                        </div>
                       </div>
                     </div>
-                  </Link>
-                </div>
+
+                    {/* Simple price shown by default */}
+                    <div className="group-hover:opacity-0 group-hover:max-h-0 max-h-20 transition-all duration-300">
+                      <div className="flex items-baseline gap-2">
+                        {product.oldPrice && (
+                          <span className="text-xs text-light-400 line-through">
+                            {formatPrice(product.oldPrice)}
+                          </span>
+                        )}
+                        <span className="text-base font-bold text-light-100">
+                          {formatPrice(product.price)}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </Link>
               ))}
             </div>
           </div>
