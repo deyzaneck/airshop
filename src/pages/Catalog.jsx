@@ -431,27 +431,29 @@ const Catalog = () => {
               {/* Content - Grid mode: compact info at bottom */}
               {viewMode === 'grid' && (
                 <div className="absolute bottom-0 left-0 right-0 p-3 z-10">
-                  {/* Default state - minimal info */}
-                  <div className="transform translate-y-0 group-hover:-translate-y-1 transition-all duration-300">
-                    <p className="text-xs text-peach-400 uppercase tracking-wider font-bold mb-1">
+                  {/* Default state - только бренд и цена */}
+                  <div className="group-hover:opacity-0 group-hover:max-h-0 max-h-20 overflow-hidden transition-all duration-300">
+                    <p className="text-xs text-peach-400 uppercase tracking-wider font-bold mb-2">
                       {product.brand}
                     </p>
-                    <h3 className="text-sm font-bold text-light-100 line-clamp-1 mb-1">
-                      {product.name}
-                    </h3>
-                    <p className="text-xs text-light-300 mb-2 opacity-80">
-                      {product.volume}
-                    </p>
+                    <div className="flex items-baseline gap-2">
+                      {product.oldPrice && (
+                        <span className="text-xs text-light-400 line-through">
+                          {formatPrice(product.oldPrice)}
+                        </span>
+                      )}
+                      <span className="text-base font-bold text-light-100">
+                        {formatPrice(product.price)}
+                      </span>
+                    </div>
                   </div>
 
-                  {/* Hover state - expanded info with backdrop blur */}
+                  {/* Hover state - модель, цена и кнопка */}
                   <div className="opacity-0 group-hover:opacity-100 max-h-0 group-hover:max-h-40 overflow-hidden transition-all duration-300">
                     <div className="bg-dark-900/95 backdrop-blur-xl rounded-xl p-3 border border-peach-400/20 shadow-2xl">
-                      {product.description && (
-                        <p className="text-xs text-light-400 line-clamp-2 mb-3">
-                          {product.description}
-                        </p>
-                      )}
+                      <h3 className="text-sm font-bold text-light-100 mb-3 line-clamp-2">
+                        {product.name}
+                      </h3>
 
                       <div className="flex items-end justify-between gap-2">
                         <div className="flex flex-col">
@@ -475,20 +477,6 @@ const Catalog = () => {
                           В корзину
                         </button>
                       </div>
-                    </div>
-                  </div>
-
-                  {/* Simple price shown by default */}
-                  <div className="group-hover:opacity-0 group-hover:max-h-0 max-h-20 transition-all duration-300">
-                    <div className="flex items-baseline gap-2">
-                      {product.oldPrice && (
-                        <span className="text-xs text-light-400 line-through">
-                          {formatPrice(product.oldPrice)}
-                        </span>
-                      )}
-                      <span className="text-base font-bold text-light-100">
-                        {formatPrice(product.price)}
-                      </span>
                     </div>
                   </div>
                 </div>
