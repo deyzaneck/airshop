@@ -292,3 +292,110 @@ def bulk_create_products():
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
+
+
+@bp.route('/reimport', methods=['POST'])
+@jwt_required()
+@limiter.limit("1 per hour")
+def reimport_products():
+    """
+    Удалить все продукты и переимпортировать из CSV
+    (только для авторизованных админов, 1 раз в час)
+
+    Response JSON:
+        message: string
+        deleted: int
+        imported: int
+    """
+    try:
+        # Удаляем все продукты
+        deleted_count = Product.query.delete()
+        db.session.commit()
+
+        # Импортируем из CSV
+        import os
+        import csv
+        import re
+
+        def parse_price(price_str):
+            price_clean = re.sub(r'[^\d]', '', str(price_str))
+            return float(price_clean) if price_clean else 0.0
+
+        def parse_category(name):
+            name_lower = name.lower()
+            if any(word in name_lower for word in ['men', 'homme', 'мужск']):
+                return 'men'
+            elif any(word in name_lower for word in ['women', 'femme', 'женск', 'miss', 'lady']):
+                return 'women'
+            else:
+                return 'unisex'
+
+        csv_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'table.csv')
+
+        if not os.path.exists(csv_path):
+            return jsonify({
+                'error': f'CSV file not found: {csv_path}',
+                'deleted': deleted_count
+            }), 404
+
+        imported_count = 0
+
+        with open(csv_path, 'r', encoding='utf-8-sig') as file:
+            csv_reader = csv.DictReader(file, delimiter=';')
+
+            for row in csv_reader:
+                try:
+                    name = row.get('Название', '').strip()
+                    if not name:
+                        continue
+
+                    description = row.get('Описание', '').strip()
+                    price_str = row.get('Цена', '0').strip()
+                    discount_str = row.get('Скидка (в процентах)', '0').strip()
+                    image_url = row.get('Изображения (через ;)', '').strip()
+
+                    price = parse_price(price_str)
+                    discount = int(discount_str) if discount_str.isdigit() else 0
+
+                    old_price = None
+                    if discount > 0:
+                        old_price = price / (1 - discount / 100)
+
+                    brand = name.split()[0] if name else 'Unknown'
+                    volume_match = re.search(r'(\d+)\s*мл', name)
+                    volume = volume_match.group(1) + 'мл' if volume_match else '100мл'
+                    category = parse_category(name)
+
+                    product = Product(
+                        name=name,
+                        brand=brand,
+                        price=price,
+                        old_price=old_price,
+                        discount=discount,
+                        volume=volume,
+                        category=category,
+                        description=description or f"Оригинальный парфюм {name}",
+                        image=image_url or 'https://images.unsplash.com/photo-1541643600914-78b084683601?w=400',
+                        is_featured=imported_count < 4,
+                        is_new=False,
+                        is_visible=True
+                    )
+
+                    db.session.add(product)
+                    imported_count += 1
+
+                except Exception as e:
+                    print(f"⚠️  Ошибка импорта товара: {str(e)}")
+                    continue
+
+        db.session.commit()
+
+        return jsonify({
+            'message': 'Products reimported successfully',
+            'deleted': deleted_count,
+            'imported': imported_count
+        }), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
