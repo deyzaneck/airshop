@@ -17,5 +17,5 @@ COPY table.csv /app/table.csv
 # Открываем порт
 EXPOSE $PORT
 
-# Запускаем Gunicorn
-CMD gunicorn -w 4 -b 0.0.0.0:$PORT run:app
+# Запускаем Gunicorn с --preload для инициализации БД до fork workers
+CMD gunicorn --preload -w 4 -b 0.0.0.0:$PORT run:app
