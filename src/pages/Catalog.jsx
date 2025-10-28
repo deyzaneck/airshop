@@ -44,13 +44,15 @@ const Catalog = () => {
   const brands = useMemo(() => {
     const uniqueBrands = [...new Set(allProducts.map(p => p.brand))];
 
-    // Топ-5 популярных брендов (можно настроить)
-    const popularBrands = ['VERSACE', 'DIOR', 'CHANEL', 'TOM FORD', 'BYREDO'];
+    // Топ-5 популярных брендов (регистронезависимое сравнение)
+    const popularBrands = ['versace', 'dior', 'chanel', 'tom', 'byredo'];
 
     // Разделяем на популярные и остальные
-    const popular = popularBrands.filter(brand => uniqueBrands.includes(brand));
+    const popular = uniqueBrands.filter(brand =>
+      popularBrands.some(pop => brand.toLowerCase().includes(pop))
+    );
     const others = uniqueBrands
-      .filter(brand => !popularBrands.includes(brand))
+      .filter(brand => !popularBrands.some(pop => brand.toLowerCase().includes(pop)))
       .sort();
 
     return { popular, others };

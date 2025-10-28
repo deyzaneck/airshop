@@ -851,8 +851,8 @@ const Admin = () => {
 
       {/* Product Edit/Add Modal */}
       {showProductModal && editingProduct && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-          <div className="card-dark max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-start justify-center p-4 bg-black/70 backdrop-blur-sm overflow-y-auto">
+          <div className="card-dark max-w-2xl w-full my-8">
             <div className="flex justify-between items-start mb-6">
               <h2 className="text-2xl font-bold text-light-100">
                 {products.find(p => p.id === editingProduct.id) ? 'Редактирование товара' : 'Добавление товара'}
@@ -955,7 +955,15 @@ const Admin = () => {
                   <input
                     type="number"
                     value={editingProduct.price}
-                    onChange={(e) => setEditingProduct({...editingProduct, price: parseInt(e.target.value)})}
+                    onChange={(e) => {
+                      const newPrice = parseInt(e.target.value) || 0;
+                      const updated = { ...editingProduct, price: newPrice };
+                      // Пересчитываем старую цену если есть скидка
+                      if (editingProduct.discount > 0) {
+                        updated.oldPrice = Math.round(newPrice / (1 - editingProduct.discount / 100));
+                      }
+                      setEditingProduct(updated);
+                    }}
                     className="input w-full"
                     required
                     min="0"
@@ -968,7 +976,17 @@ const Admin = () => {
                   <input
                     type="number"
                     value={editingProduct.oldPrice || ''}
-                    onChange={(e) => setEditingProduct({...editingProduct, oldPrice: e.target.value ? parseInt(e.target.value) : null})}
+                    onChange={(e) => {
+                      const newOldPrice = e.target.value ? parseInt(e.target.value) : null;
+                      const updated = { ...editingProduct, oldPrice: newOldPrice };
+                      // Автоматически рассчитываем скидку из старой цены
+                      if (newOldPrice && newOldPrice > editingProduct.price) {
+                        updated.discount = Math.round(((newOldPrice - editingProduct.price) / newOldPrice) * 100);
+                      } else {
+                        updated.discount = 0;
+                      }
+                      setEditingProduct(updated);
+                    }}
                     className="input w-full"
                     min="0"
                   />
@@ -980,7 +998,17 @@ const Admin = () => {
                   <input
                     type="number"
                     value={editingProduct.discount}
-                    onChange={(e) => setEditingProduct({...editingProduct, discount: parseInt(e.target.value)})}
+                    onChange={(e) => {
+                      const newDiscount = parseInt(e.target.value) || 0;
+                      const updated = { ...editingProduct, discount: newDiscount };
+                      // Автоматически рассчитываем старую цену из скидки
+                      if (newDiscount > 0 && newDiscount <= 100) {
+                        updated.oldPrice = Math.round(editingProduct.price / (1 - newDiscount / 100));
+                      } else {
+                        updated.oldPrice = null;
+                      }
+                      setEditingProduct(updated);
+                    }}
                     className="input w-full"
                     min="0"
                     max="100"
