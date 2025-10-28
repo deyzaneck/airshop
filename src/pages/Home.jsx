@@ -248,7 +248,7 @@ const Home = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
             {products.slice(0, 4).map((product, index) => (
               <Link
                 key={product.id}
@@ -264,8 +264,11 @@ const Home = () => {
                   loading="lazy"
                 />
 
-                {/* Gradient Overlay - light by default, stronger on hover */}
-                <div className="absolute inset-0 bg-gradient-to-t from-dark-900/70 via-dark-900/20 to-transparent opacity-40 group-hover:opacity-90 transition-opacity duration-300"></div>
+                {/* Gradient Overlay - всегда сильное затенение внизу для читаемости */}
+                <div className="absolute inset-0 bg-gradient-to-t from-dark-900/95 via-dark-900/60 to-transparent group-hover:from-dark-900 transition-all duration-300"></div>
+
+                {/* Дополнительный backdrop blur для текста */}
+                <div className="absolute bottom-0 left-0 right-0 h-1/2 backdrop-blur-[2px] opacity-60 group-hover:opacity-80 transition-opacity duration-300"></div>
 
                 {/* Badges */}
                 <div className="absolute top-3 left-3 right-3 flex justify-between items-start z-10">
@@ -285,24 +288,24 @@ const Home = () => {
 
                 {/* Content - small at bottom by default, grows and moves up on hover */}
                 <div className="absolute bottom-0 left-0 right-0 p-3 z-10 transform translate-y-0 group-hover:-translate-y-2 transition-all duration-300">
-                  <p className="text-[10px] group-hover:text-xs text-peach-400 uppercase tracking-wider mb-0.5 group-hover:mb-1 font-bold transition-all duration-300">
+                  <p className="text-[10px] sm:text-xs text-peach-400 uppercase tracking-wider mb-0.5 group-hover:mb-1 font-bold transition-all duration-300 drop-shadow-lg">
                     {product.brand}
                   </p>
-                  <h3 className="text-xs group-hover:text-base font-bold text-light-100 mb-0.5 group-hover:mb-1 line-clamp-2 group-hover:text-peach-400 transition-all duration-300">
+                  <h3 className="text-xs sm:text-sm group-hover:text-base font-bold text-light-100 mb-0.5 group-hover:mb-1 line-clamp-2 group-hover:text-peach-400 transition-all duration-300 drop-shadow-lg">
                     {product.name}
                   </h3>
-                  <p className="text-[10px] group-hover:text-xs text-light-300 mb-1 group-hover:mb-3 transition-all duration-300">
+                  <p className="text-[10px] sm:text-xs text-light-300 mb-1 group-hover:mb-3 transition-all duration-300 drop-shadow-lg">
                     {product.volume}
                   </p>
 
                   <div className="flex items-center justify-between">
                     <div className="flex flex-col">
                       {product.oldPrice && (
-                        <span className="text-[10px] group-hover:text-xs text-light-400 line-through transition-all duration-300">
+                        <span className="text-[10px] sm:text-xs text-light-400 line-through transition-all duration-300 drop-shadow-lg">
                           {formatPrice(product.oldPrice)}
                         </span>
                       )}
-                      <span className="text-sm group-hover:text-xl font-bold text-light-100 transition-all duration-300">
+                      <span className="text-sm sm:text-base group-hover:text-xl font-bold text-light-100 transition-all duration-300 drop-shadow-lg">
                         {formatPrice(product.price)}
                       </span>
                     </div>
