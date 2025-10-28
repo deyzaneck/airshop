@@ -3,10 +3,6 @@ import axios from 'axios';
 // Базовый URL бэкенда
 const BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
-// DEBUG: показываем какой URL используется
-console.log('🔗 API URL:', BASE_URL);
-console.log('🔧 REACT_APP_API_URL:', process.env.REACT_APP_API_URL);
-
 // Создание axios instance
 const apiClient = axios.create({
   baseURL: BASE_URL,

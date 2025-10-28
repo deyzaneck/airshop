@@ -12,7 +12,9 @@
       "Bash(git commit:*)",
       "Bash(git push)",
       "Bash(del nixpacks.toml railway.json)",
-      "Bash(git rm:*)"
+      "Bash(git rm:*)",
+      "Bash(python:*)",
+      "Bash(wc:*)"
     ],
     "deny": [],
     "ask": []

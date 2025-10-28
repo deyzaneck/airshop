@@ -411,7 +411,7 @@ const Admin = () => {
                 </div>
               ) : (
                 <div className="overflow-x-auto">
-                  <table className="w-full">
+                  <table className="w-full mobile-stack-table">
                     <thead>
                       <tr className="border-b border-glass">
                         <th className="text-left py-3 px-4 text-light-200 font-semibold">ID</th>
@@ -426,17 +426,17 @@ const Admin = () => {
                     <tbody>
                       {orders.map((order) => (
                         <tr key={order.id} className="border-b border-glass/50 hover:bg-glass/50 transition-colors">
-                          <td className="py-3 px-4 text-light-100 font-semibold">#{order.id}</td>
-                          <td className="py-3 px-4 text-light-300">{order.customer?.name || order.customer}</td>
-                          <td className="py-3 px-4 text-light-300 text-sm">
+                          <td data-label="ID" className="py-3 px-4 text-light-100 font-semibold">#{order.id}</td>
+                          <td data-label="Клиент" className="py-3 px-4 text-light-300">{order.customer?.name || order.customer}</td>
+                          <td data-label="Контакт" className="py-3 px-4 text-light-300 text-sm">
                             {order.customer?.email || order.contactInfo?.email || 'Не указан'}
                           </td>
-                          <td className="py-3 px-4 text-peach-400 font-semibold">{formatPrice(order.totalAmount || order.amount)}</td>
-                          <td className="py-3 px-4">
+                          <td data-label="Сумма" className="py-3 px-4 text-peach-400 font-semibold">{formatPrice(order.totalAmount || order.amount)}</td>
+                          <td data-label="Статус" className="py-3 px-4">
                             <select
                               value={order.status}
                               onChange={(e) => handleStatusChange(order.id, e.target.value)}
-                              className={`text-xs px-2 py-1 rounded-full border ${getStatusColor(order.status)} bg-dark-700 cursor-pointer`}
+                              className={`text-xs px-2 py-1 rounded-full border ${getStatusColor(order.status)} bg-dark-700 cursor-pointer w-full`}
                             >
                               <option value="Обработка">Обработка</option>
                               <option value="Ожидает оплаты">Ожидает оплаты</option>
@@ -447,10 +447,10 @@ const Admin = () => {
                               <option value="Отменен">Отменен</option>
                             </select>
                           </td>
-                          <td className="py-3 px-4 text-light-400">
+                          <td data-label="Дата" className="py-3 px-4 text-light-400">
                             {order.createdAt ? new Date(order.createdAt).toLocaleDateString('ru-RU') : order.date}
                           </td>
-                          <td className="py-3 px-4">
+                          <td data-label="Действия" className="py-3 px-4">
                             <button
                               onClick={() => openOrderDetails(order)}
                               className="btn-icon hover:bg-peach-400/10"
