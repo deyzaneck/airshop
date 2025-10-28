@@ -8,6 +8,7 @@ const Home = () => {
   const [products, setProducts] = useState([]);
   const [settings, setSettings] = useState({});
   const [particles, setParticles] = useState([]);
+  const [hoveredIndex, setHoveredIndex] = useState(null);
 
   useEffect(() => {
     // Загружаем товары из API
@@ -248,81 +249,113 @@ const Home = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-            {products.slice(0, 4).map((product, index) => (
-              <Link
-                key={product.id}
-                to={`/product/${product.id}`}
-                className="group relative overflow-hidden rounded-2xl aspect-[3/4] border border-glass hover:border-peach-400/50 transition-all duration-500 hover:shadow-2xl hover:scale-105 animate-fade-in"
-                style={{animationDelay: `${0.1 * (index + 1)}s`}}
-              >
-                {/* Background Image */}
-                <img
-                  src={product.image}
-                  alt={product.name}
-                  className="absolute inset-0 w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
-                  loading="lazy"
-                />
+          {/* Centered grid container */}
+          <div className="max-w-5xl mx-auto">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 justify-items-center">
+              {products.slice(0, 4).map((product, index) => (
+                <div
+                  key={product.id}
+                  className={`relative transition-all duration-500 animate-fade-in w-full ${
+                    hoveredIndex === index
+                      ? 'col-span-2 z-20'
+                      : hoveredIndex !== null && Math.abs(hoveredIndex - index) === 1
+                      ? 'scale-95 opacity-90'
+                      : ''
+                  }`}
+                  style={{animationDelay: `${0.1 * (index + 1)}s`}}
+                  onMouseEnter={() => setHoveredIndex(index)}
+                  onMouseLeave={() => setHoveredIndex(null)}
+                >
+                  <Link
+                    to={`/product/${product.id}`}
+                    className="group relative overflow-hidden rounded-2xl aspect-[3/4] border border-glass hover:border-peach-400 transition-all duration-500 block hover-lift hover-glow"
+                  >
+                    {/* Background Image */}
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className={`absolute inset-0 object-cover transform transition-all duration-700 ${
+                        hoveredIndex === index
+                          ? 'w-1/2 group-hover:scale-110'
+                          : 'w-full h-full group-hover:scale-105'
+                      }`}
+                      loading="lazy"
+                    />
 
-                {/* Gradient Overlay - всегда сильное затенение внизу для читаемости */}
-                <div className="absolute inset-0 bg-gradient-to-t from-dark-900/95 via-dark-900/60 to-transparent group-hover:from-dark-900 transition-all duration-300"></div>
+                    {/* Gradient Overlay on Image */}
+                    <div className={`absolute inset-0 bg-gradient-to-t from-dark-900/40 to-transparent transition-all duration-300 ${
+                      hoveredIndex === index ? 'w-1/2' : 'w-full'
+                    }`}></div>
 
-                {/* Дополнительный backdrop blur для текста */}
-                <div className="absolute bottom-0 left-0 right-0 h-1/2 backdrop-blur-[2px] opacity-60 group-hover:opacity-80 transition-opacity duration-300"></div>
-
-                {/* Badges */}
-                <div className="absolute top-3 left-3 right-3 flex justify-between items-start z-10">
-                  {product.isNew && (
-                    <span className="badge badge-outline bg-dark-900/80 backdrop-blur-sm">
-                      Новинка
-                    </span>
-                  )}
-                  <div className="flex gap-2 ml-auto">
-                    {product.discount > 0 && (
-                      <span className="badge badge-accent">
-                        -{product.discount}%
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                {/* Content - small at bottom by default, grows and moves up on hover */}
-                <div className="absolute bottom-0 left-0 right-0 p-3 z-10 transform translate-y-0 group-hover:-translate-y-2 transition-all duration-300">
-                  <p className="text-[10px] sm:text-xs text-peach-400 uppercase tracking-wider mb-0.5 group-hover:mb-1 font-bold transition-all duration-300 drop-shadow-lg">
-                    {product.brand}
-                  </p>
-                  <h3 className="text-xs sm:text-sm group-hover:text-base font-bold text-light-100 mb-0.5 group-hover:mb-1 line-clamp-2 group-hover:text-peach-400 transition-all duration-300 drop-shadow-lg">
-                    {product.name}
-                  </h3>
-                  <p className="text-[10px] sm:text-xs text-light-300 mb-1 group-hover:mb-3 transition-all duration-300 drop-shadow-lg">
-                    {product.volume}
-                  </p>
-
-                  <div className="flex items-center justify-between">
-                    <div className="flex flex-col">
-                      {product.oldPrice && (
-                        <span className="text-[10px] sm:text-xs text-light-400 line-through transition-all duration-300 drop-shadow-lg">
-                          {formatPrice(product.oldPrice)}
+                    {/* Badges */}
+                    <div className="absolute top-3 left-3 right-3 flex justify-between items-start z-10">
+                      {product.isNew && (
+                        <span className="badge badge-outline bg-dark-900/80 backdrop-blur-sm text-xs">
+                          Новинка
                         </span>
                       )}
-                      <span className="text-sm sm:text-base group-hover:text-xl font-bold text-light-100 transition-all duration-300 drop-shadow-lg">
-                        {formatPrice(product.price)}
-                      </span>
+                      <div className="flex gap-2 ml-auto">
+                        {product.discount > 0 && (
+                          <span className="badge badge-accent text-xs">
+                            -{product.discount}%
+                          </span>
+                        )}
+                      </div>
                     </div>
 
-                    <button
-                      onClick={(e) => {
-                        e.preventDefault();
-                        handleAddToCart(product);
-                      }}
-                      className="btn btn-primary text-sm py-2 px-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                    {/* Slide-out Info Panel */}
+                    <div
+                      className={`absolute top-0 right-0 bottom-0 w-1/2 bg-gradient-to-br from-dark-800/98 via-wine-900/95 to-dark-900/98 backdrop-blur-xl border-l border-peach-400/30 p-4 flex flex-col justify-between transform transition-all duration-500 ${
+                        hoveredIndex === index
+                          ? 'translate-x-0 opacity-100'
+                          : 'translate-x-full opacity-0 pointer-events-none'
+                      }`}
                     >
-                      В корзину
-                    </button>
-                  </div>
+                      <div className="space-y-2">
+                        <p className="text-xs text-peach-400 uppercase tracking-wider font-bold">
+                          {product.brand}
+                        </p>
+                        <h3 className="text-sm md:text-base font-bold text-light-100 line-clamp-3 leading-tight">
+                          {product.name}
+                        </h3>
+                        <p className="text-xs text-light-300">
+                          {product.volume}
+                        </p>
+
+                        {product.description && (
+                          <p className="text-xs text-light-400 line-clamp-3 mt-2">
+                            {product.description}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="space-y-3">
+                        <div className="flex items-baseline gap-2">
+                          {product.oldPrice && (
+                            <span className="text-xs text-light-400 line-through">
+                              {formatPrice(product.oldPrice)}
+                            </span>
+                          )}
+                          <span className="text-xl font-bold text-light-100">
+                            {formatPrice(product.price)}
+                          </span>
+                        </div>
+
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleAddToCart(product);
+                          }}
+                          className="btn btn-primary text-xs py-2 px-3 w-full"
+                        >
+                          В корзину
+                        </button>
+                      </div>
+                    </div>
+                  </Link>
                 </div>
-              </Link>
-            ))}
+              ))}
+            </div>
           </div>
 
           <div className="text-center mt-16 animate-fade-in" style={{animationDelay: '0.6s'}}>

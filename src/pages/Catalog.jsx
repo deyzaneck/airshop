@@ -122,6 +122,8 @@ const Catalog = () => {
     return filtered;
   }, [allProducts, category, searchParams, selectedBrands, priceRange, selectedVolumes, sortBy]);
 
+  const [hoveredIndex, setHoveredIndex] = useState(null);
+
   const handleAddToCart = (product) => {
     addToCart(product, 1);
     window.dispatchEvent(new Event('cartUpdated'));
@@ -393,132 +395,156 @@ const Catalog = () => {
         {/* Products Grid/List */}
         <div className={`grid gap-4 ${viewMode === 'grid' ? 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5' : 'grid-cols-1'}`}>
           {products.map((product, index) => (
-            <Link
+            <div
               key={product.id}
-              to={`/product/${product.id}`}
-              className={`group relative overflow-hidden rounded-2xl border border-glass hover:border-peach-400 transition-all duration-500 hover-lift hover-glow animate-scale-in ${
-                viewMode === 'grid' ? 'aspect-[3/4]' : 'aspect-[5/2] md:aspect-[6/1]'
+              className={`relative transition-all duration-500 animate-scale-in ${
+                viewMode === 'grid'
+                  ? hoveredIndex === index
+                    ? 'col-span-2 z-20'
+                    : hoveredIndex !== null && Math.abs(hoveredIndex - index) === 1
+                    ? 'scale-95 opacity-90'
+                    : ''
+                  : ''
               }`}
               style={{animationDelay: `${index * 0.05}s`}}
+              onMouseEnter={() => setHoveredIndex(index)}
+              onMouseLeave={() => setHoveredIndex(null)}
             >
-              {/* Background Image */}
-              <img
-                src={product.image}
-                alt={product.name}
-                className="absolute inset-0 w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
-                loading="lazy"
-              />
+              <Link
+                to={`/product/${product.id}`}
+                className={`group relative overflow-hidden rounded-2xl border border-glass hover:border-peach-400 transition-all duration-500 block ${
+                  viewMode === 'grid' ? 'aspect-[3/4]' : 'aspect-[5/2] md:aspect-[6/1]'
+                } hover-lift hover-glow`}
+              >
+                {/* Background Image */}
+                <img
+                  src={product.image}
+                  alt={product.name}
+                  className={`absolute inset-0 object-cover transform transition-all duration-700 ${
+                    hoveredIndex === index && viewMode === 'grid'
+                      ? 'w-1/2 group-hover:scale-110'
+                      : 'w-full h-full group-hover:scale-105'
+                  }`}
+                  loading="lazy"
+                />
 
-              {/* Gradient Overlay - всегда сильное затенение внизу для читаемости */}
-              <div className="absolute inset-0 bg-gradient-to-t from-dark-900/95 via-dark-900/60 to-transparent group-hover:from-dark-900 transition-all duration-300"></div>
+                {/* Gradient Overlay on Image */}
+                <div className={`absolute inset-0 bg-gradient-to-t from-dark-900/40 to-transparent transition-all duration-300 ${
+                  hoveredIndex === index && viewMode === 'grid' ? 'w-1/2' : 'w-full'
+                }`}></div>
 
-              {/* Дополнительный backdrop blur для текста */}
-              <div className="absolute bottom-0 left-0 right-0 h-1/2 backdrop-blur-[2px] opacity-60 group-hover:opacity-80 transition-opacity duration-300"></div>
-
-              {/* Badges */}
-              <div className="absolute top-3 left-3 right-3 flex justify-between items-start z-10">
-                {product.isNew && (
-                  <span className="badge badge-outline bg-dark-900/80 backdrop-blur-sm">
-                    Новинка
-                  </span>
-                )}
-                <div className="flex gap-2 ml-auto">
-                  {product.discount > 0 && (
-                    <span className="badge badge-accent">
-                      -{product.discount}%
+                {/* Badges */}
+                <div className="absolute top-3 left-3 right-3 flex justify-between items-start z-10">
+                  {product.isNew && (
+                    <span className="badge badge-outline bg-dark-900/80 backdrop-blur-sm text-xs">
+                      Новинка
                     </span>
                   )}
+                  <div className="flex gap-2 ml-auto">
+                    {product.discount > 0 && (
+                      <span className="badge badge-accent text-xs">
+                        -{product.discount}%
+                      </span>
+                    )}
+                  </div>
                 </div>
-              </div>
 
-              {/* Content - адаптивный для grid/list */}
-              <div className={`absolute z-10 transition-all duration-300 ${
-                viewMode === 'grid'
-                  ? 'bottom-0 left-0 right-0 p-3 transform translate-y-0 group-hover:-translate-y-2'
-                  : 'inset-0 flex items-center'
-              }`}>
-                {viewMode === 'grid' ? (
-                  // Grid layout
-                  <>
-                    <div className="w-full">
-                      <p className="text-[10px] sm:text-xs text-peach-400 uppercase tracking-wider mb-0.5 group-hover:mb-1 font-bold transition-all duration-300 drop-shadow-lg">
+                {/* Slide-out Info Panel - только для grid mode */}
+                {viewMode === 'grid' && (
+                  <div
+                    className={`absolute top-0 right-0 bottom-0 w-1/2 bg-gradient-to-br from-dark-800/98 via-wine-900/95 to-dark-900/98 backdrop-blur-xl border-l border-peach-400/30 p-4 flex flex-col justify-between transform transition-all duration-500 ${
+                      hoveredIndex === index
+                        ? 'translate-x-0 opacity-100'
+                        : 'translate-x-full opacity-0 pointer-events-none'
+                    }`}
+                  >
+                    <div className="space-y-2">
+                      <p className="text-xs text-peach-400 uppercase tracking-wider font-bold">
                         {product.brand}
                       </p>
-                      <h3 className="text-xs sm:text-sm group-hover:text-base font-bold text-light-100 mb-0.5 group-hover:mb-1 line-clamp-2 group-hover:text-peach-400 transition-all duration-300 drop-shadow-lg">
+                      <h3 className="text-sm md:text-base font-bold text-light-100 line-clamp-3 leading-tight">
                         {product.name}
                       </h3>
-                      <p className="text-[10px] sm:text-xs text-light-300 mb-1 group-hover:mb-3 transition-all duration-300 drop-shadow-lg">
+                      <p className="text-xs text-light-300">
                         {product.volume}
                       </p>
 
-                      <div className="flex items-center justify-between">
-                        <div className="flex flex-col">
-                          {product.oldPrice && (
-                            <span className="text-[10px] sm:text-xs text-light-400 line-through transition-all duration-300 drop-shadow-lg">
-                              {formatPrice(product.oldPrice)}
-                            </span>
-                          )}
-                          <span className="text-sm sm:text-base group-hover:text-xl font-bold text-light-100 transition-all duration-300 drop-shadow-lg">
-                            {formatPrice(product.price)}
-                          </span>
-                        </div>
-
-                        <button
-                          onClick={(e) => {
-                            e.preventDefault();
-                            handleAddToCart(product);
-                          }}
-                          className="btn btn-primary text-sm py-2 px-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                        >
-                          В корзину
-                        </button>
-                      </div>
+                      {product.description && (
+                        <p className="text-xs text-light-400 line-clamp-3 mt-2">
+                          {product.description}
+                        </p>
+                      )}
                     </div>
-                  </>
-                ) : (
-                  // List layout - горизонтальный
-                  <div className="flex items-center gap-4 md:gap-6 px-4 w-full">
-                    {/* Левая часть - текст */}
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs text-peach-400 uppercase tracking-wider mb-1 font-bold">
-                        {product.brand}
-                      </p>
-                      <h3 className="text-base md:text-lg font-bold text-light-100 mb-1 line-clamp-1 group-hover:text-peach-400 transition-colors">
-                        {product.name}
-                      </h3>
-                      <p className="text-sm text-light-300 mb-2">
-                        {product.volume}
-                      </p>
 
-                      {/* Цены */}
-                      <div className="flex items-baseline gap-3">
+                    <div className="space-y-3">
+                      <div className="flex items-baseline gap-2">
                         {product.oldPrice && (
-                          <span className="text-sm text-light-400 line-through">
+                          <span className="text-xs text-light-400 line-through">
                             {formatPrice(product.oldPrice)}
                           </span>
                         )}
-                        <span className="text-xl md:text-2xl font-bold text-light-100">
+                        <span className="text-xl font-bold text-light-100">
                           {formatPrice(product.price)}
                         </span>
                       </div>
-                    </div>
 
-                    {/* Правая часть - кнопка */}
-                    <div className="flex-shrink-0">
                       <button
                         onClick={(e) => {
                           e.preventDefault();
                           handleAddToCart(product);
                         }}
-                        className="btn btn-primary text-sm py-2 px-4 md:py-3 md:px-6"
+                        className="btn btn-primary text-xs py-2 px-3 w-full"
                       >
                         В корзину
                       </button>
                     </div>
                   </div>
                 )}
-              </div>
-            </Link>
+
+                {/* List mode content */}
+                {viewMode === 'list' && (
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="absolute inset-0 bg-gradient-to-t from-dark-900/95 via-dark-900/60 to-transparent"></div>
+                    <div className="flex items-center gap-4 md:gap-6 px-4 w-full relative z-10">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs text-peach-400 uppercase tracking-wider mb-1 font-bold">
+                          {product.brand}
+                        </p>
+                        <h3 className="text-base md:text-lg font-bold text-light-100 mb-1 line-clamp-1 group-hover:text-peach-400 transition-colors">
+                          {product.name}
+                        </h3>
+                        <p className="text-sm text-light-300 mb-2">
+                          {product.volume}
+                        </p>
+
+                        <div className="flex items-baseline gap-3">
+                          {product.oldPrice && (
+                            <span className="text-sm text-light-400 line-through">
+                              {formatPrice(product.oldPrice)}
+                            </span>
+                          )}
+                          <span className="text-xl md:text-2xl font-bold text-light-100">
+                            {formatPrice(product.price)}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="flex-shrink-0">
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleAddToCart(product);
+                          }}
+                          className="btn btn-primary text-xs py-2 px-3 md:text-sm md:py-2 md:px-4"
+                        >
+                          В корзину
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </Link>
+            </div>
           ))}
         </div>
 
