@@ -460,24 +460,26 @@ const Catalog = () => {
                           {product.name}
                         </h3>
 
-                        <div className="flex items-end justify-between gap-2">
-                          <div className="flex flex-col">
+                        <div className="space-y-2">
+                          {/* Цена */}
+                          <div className="flex items-baseline gap-2">
                             {product.oldPrice && (
-                              <span className="text-xs text-light-300/70 line-through mb-0.5">
+                              <span className="text-xs text-light-300/70 line-through">
                                 {formatPrice(product.oldPrice)}
                               </span>
                             )}
-                            <span className="text-xl font-bold text-light-100 bg-gradient-to-r from-peach-400 to-gold-400 bg-clip-text text-transparent">
+                            <span className="text-lg md:text-xl font-bold text-light-100 bg-gradient-to-r from-peach-400 to-gold-400 bg-clip-text text-transparent">
                               {formatPrice(product.price)}
                             </span>
                           </div>
 
+                          {/* Кнопка на всю ширину */}
                           <button
                             onClick={(e) => {
                               e.preventDefault();
                               handleAddToCart(product);
                             }}
-                            className="btn btn-primary text-[10px] py-1.5 px-2 whitespace-nowrap shadow-lg hover:shadow-peach-400/50 transition-all duration-300 leading-tight"
+                            className="btn btn-primary w-full text-xs py-2 shadow-lg hover:shadow-peach-400/50 transition-all duration-300"
                           >
                             В корзину
                           </button>
